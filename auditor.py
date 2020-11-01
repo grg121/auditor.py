@@ -179,7 +179,7 @@ class Auditor(plugin.Plugin):
         Write log_string to the log file
         """
         fd = open(self.log_file, 'a+')
-        fd.write(f"\n{log_string}")
+        fd.write(f"{log_string}\n")
         fd.flush()
         fd.close()
 
