@@ -171,7 +171,11 @@ class Auditor(plugin.Plugin):
         Creates a log line with both user input and command output and
         register it into the log file
         """
-        command_name = command[0]
+        if command.splitlines():
+            command_name = command.splitlines()[0]
+        else:
+            command_name = "auditor.py"
+
         log_line = f"{datestamp} {timestamp} {hostname} {command_name}: {command} executed with output:  {output}"
         print(log_line)
         self.write_logs(log_line)
