@@ -19,9 +19,6 @@ home_directory = expanduser("~")
 datestamp = datetime.today().strftime('%b %d')
 timestamp = datetime.today().strftime('%H:%M:%S')
 
-hostname = os.uname()[1]
-
-
 class Auditor(plugin.Plugin):
 
     """ Add custom command to the terminal menu"""
@@ -73,6 +70,7 @@ class Auditor(plugin.Plugin):
         self.loggers[vte_terminal]["last_saved_col"] = 0
         self.loggers[vte_terminal]["last_saved_row"] = 0
         self.loggers[vte_terminal]["prompt_offset"] = 0
+        self.loggers[vte_terminal]["prompt_string"] = "local"
 
         # callbacks
         self.commit_handler_id = vte_terminal.connect('commit', self.capture_input)
@@ -91,11 +89,24 @@ class Auditor(plugin.Plugin):
         if last_saved_col != current_col or last_saved_row != current_row:
             missing_output = self.get_content(terminal, last_saved_row, last_saved_col,
                                               current_row, current_col)
-        self.register_command(missing_output)
+        prompt_string = self.loggers[vte_terminal]["prompt_string"]
+        self.register_command(self.loggers[vte_terminal]["last_command"], missing_output, prompt_string)
         vte_terminal.disconnect(self.loggers[vte_terminal]["commit_handler_id"])
         vte_terminal.disconnect(self.loggers[vte_terminal]["contents_changed_id"])
 
     # -------------------------------------------------------------------------------------------------------------------------
+
+    def cleanPrompt(self, string):
+        clean_prompt = ""
+        for char in string:
+            if char.isalnum() or char in ["/", "@"]:
+                clean_prompt += char
+            elif char == "~":
+                clean_prompt += "home"
+        return clean_prompt
+
+    # -------------------------------------------------------------------------------------------------------------------------
+
 
     def capture_input(self, vte_terminal, input_pointer, input_length):
         """ 'commit' signal callback (user input)
@@ -109,6 +120,8 @@ class Auditor(plugin.Plugin):
 
         if not prompt_known:
             self.loggers[vte_terminal]["prompt_offset"] = current_col
+            prompt = self.get_content(vte_terminal, current_row, 0, current_row, current_col)
+            self.loggers[vte_terminal]["prompt_string"] = self.cleanPrompt(prompt)
 
         input_string = '{: <{}}'.format(input_pointer, input_length)
 
@@ -160,13 +173,14 @@ class Auditor(plugin.Plugin):
 
         else:
             command_output = get_command_output(console_content)
-            self.register_command(self.loggers[vte_terminal]["last_command"], command_output)
+            prompt_string = self.loggers[vte_terminal]["prompt_string"]
+            self.register_command(self.loggers[vte_terminal]["last_command"], command_output, prompt_string)
             self.loggers[vte_terminal]["last_saved_col"] = current_col
             self.loggers[vte_terminal]["last_saved_row"] = current_row
 
     # -------------------------------------------------------------------------------------------------------------------------
 
-    def register_command(self, command, output):
+    def register_command(self, command, output, prompt):
         """
         Creates a log line with both user input and command output and
         register it into the log file
@@ -176,7 +190,7 @@ class Auditor(plugin.Plugin):
         else:
             command_name = "auditor.py"
 
-        log_line = f"{datestamp} {timestamp} {hostname} {command_name}: {command} executed with output:  {output}"
+        log_line = f"{datestamp} {timestamp} {prompt} {command_name}: {command} executed with output:  {output}"
         print(log_line)
         self.write_logs(log_line)
 
