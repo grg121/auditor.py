@@ -6,6 +6,8 @@ terminal and register both user input and console output togeter
 into a syslog event logger.
 """
 
+from os.path import expanduser
+import os
 from gi.repository import Gtk
 import terminatorlib.plugin as plugin
 from terminatorlib.translation import _
@@ -13,12 +15,18 @@ from datetime import datetime
 
 AVAILABLE = ['Auditor']
 
+home_directory = expanduser("~")
+datestamp = datetime.today().strftime('%b %d')
+timestamp = datetime.today().strftime('%H:%M:%S')
 
 class Auditor(plugin.Plugin):
 
     """ Add custom command to the terminal menu"""
     capabilities = ['terminal_menu']
-    log_file = "test.log"
+    log_directory = f"{home_directory}/.session_logs"
+    if not os.path.exists(log_directory):
+        os.makedirs(log_directory)
+    log_file = f"{log_directory}/{datestamp}.log".replace(" ", "-")
     loggers = None
     dialog_action = Gtk.FileChooserAction.SAVE
     dialog_buttons = (_("_Cancel"), Gtk.ResponseType.CANCEL,
@@ -160,17 +168,18 @@ class Auditor(plugin.Plugin):
         Creates a log line with both user input and command output and
         register it into the log file
         """
-        timestamp = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
-        print(f"{timestamp} kali-linux Auditor: {command} executed with output:  {output}")
+        log_line = f"{datestamp} {timestamp} kali~linux Auditor: '{command}' executed with output:  {output}"
+        print(log_line)
+        self.write_logs(log_line)
 
     # -------------------------------------------------------------------------------------------------------------------------
 
-    def write_logs(self, terminal, log_string):
+    def write_logs(self, log_string):
         """
         Write log_string to the log file
         """
-        fd = open(self.log_file, 'w+')
-        fd.write(log_string)
+        fd = open(self.log_file, 'a+')
+        fd.write(f"\n{log_string}")
         fd.flush()
         fd.close()
 

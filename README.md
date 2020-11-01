@@ -14,6 +14,7 @@
 ## Install
 
 ```sh
+mkdir -p ~/.config/terminator/plugins
 cp auditor.py ~/.config/terminator/plugins/
 ```
 
