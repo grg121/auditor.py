@@ -98,11 +98,19 @@ class Auditor(plugin.Plugin):
 
     def cleanPrompt(self, string):
         clean_prompt = ""
+        char_replacement = {
+          '@': '@',
+          '/': '/',
+          '[': '(',
+          ']': ')',
+          ':': '_'
+        }
+
         for char in string:
-            if char.isalnum() or char in ["/", "@"]:
+            if char.isalnum():
                 clean_prompt += char
-            elif char == "~":
-                clean_prompt += "home"
+            elif char in char_replacement.keys():
+                clean_prompt += char_replacement[char]
         return clean_prompt
 
     # -------------------------------------------------------------------------------------------------------------------------
@@ -133,7 +141,6 @@ class Auditor(plugin.Plugin):
                                                                           current_row, current_col)
             self.loggers[vte_terminal]["last_saved_row"] = current_row+1
             self.loggers[vte_terminal]["last_saved_col"] = 0
-            self.loggers[vte_terminal]["prompt_offset"] = 0
 
     # -------------------------------------------------------------------------------------------------------------------------
 
@@ -177,6 +184,7 @@ class Auditor(plugin.Plugin):
             self.register_command(self.loggers[vte_terminal]["last_command"], command_output, prompt_string)
             self.loggers[vte_terminal]["last_saved_col"] = current_col
             self.loggers[vte_terminal]["last_saved_row"] = current_row
+            self.loggers[vte_terminal]["prompt_offset"] = 0
 
     # -------------------------------------------------------------------------------------------------------------------------
 
