@@ -19,6 +19,9 @@ home_directory = expanduser("~")
 datestamp = datetime.today().strftime('%b %d')
 timestamp = datetime.today().strftime('%H:%M:%S')
 
+hostname = os.uname()[1]
+
+
 class Auditor(plugin.Plugin):
 
     """ Add custom command to the terminal menu"""
@@ -168,7 +171,8 @@ class Auditor(plugin.Plugin):
         Creates a log line with both user input and command output and
         register it into the log file
         """
-        log_line = f"{datestamp} {timestamp} kali~linux Auditor: '{command}' executed with output:  {output}"
+        command_name = command[0]
+        log_line = f"{datestamp} {timestamp} {hostname} {command_name}: {command} executed with output:  {output}"
         print(log_line)
         self.write_logs(log_line)
 
