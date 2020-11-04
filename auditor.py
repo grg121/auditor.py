@@ -96,6 +96,8 @@ class Auditor(plugin.Plugin):
         vte_terminal.disconnect(self.loggers[vte_terminal]["commit_handler_id"])
         vte_terminal.disconnect(self.loggers[vte_terminal]["contents_changed_id"])
 
+        del(self.loggers[vte_terminal])
+
     # -------------------------------------------------------------------------------------------------------------------------
 
     def cleanPrompt(self, string):
