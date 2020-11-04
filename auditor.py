@@ -19,6 +19,8 @@ home_directory = expanduser("~")
 datestamp = datetime.today().strftime('%b %d')
 timestamp = datetime.today().strftime('%H:%M:%S')
 
+program_name = "Auditor"
+
 class Auditor(plugin.Plugin):
 
     """ Add custom command to the terminal menu"""
@@ -198,7 +200,7 @@ class Auditor(plugin.Plugin):
         else:
             command_name = "auditor.py"
 
-        log_line = f"{datestamp} {timestamp} {prompt} {command_name}: {command} executed with output:  {output}"
+        log_line = f"{datestamp} {timestamp} {prompt} {program_name}: {command} executed with output:  {output}"
         print(log_line)
         self.write_logs(log_line)
 
