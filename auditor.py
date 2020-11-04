@@ -21,6 +21,7 @@ timestamp = datetime.today().strftime('%H:%M:%S')
 
 program_name = "Auditor"
 
+
 class Auditor(plugin.Plugin):
 
     """ Add custom command to the terminal menu"""
@@ -141,6 +142,9 @@ class Auditor(plugin.Plugin):
 
         if is_return:
             prompt_offset = self.loggers[vte_terminal]["prompt_offset"]
+            command_line = self.get_content(vte_terminal, current_row, 0, current_row, current_col)
+            if "[sudo] password for" in command_line:
+                return
             self.loggers[vte_terminal]["last_command"] = self.get_content(vte_terminal, current_row, prompt_offset,
                                                                           current_row, current_col)
             self.loggers[vte_terminal]["last_saved_row"] = current_row+1
@@ -197,11 +201,6 @@ class Auditor(plugin.Plugin):
         Creates a log line with both user input and command output and
         register it into the log file
         """
-        if command.splitlines():
-            command_name = command.splitlines()[0]
-        else:
-            command_name = "auditor.py"
-
         log_line = f"{datestamp} {timestamp} {prompt} {program_name}: {command} executed with output:  {output}"
         print(log_line)
         self.write_logs(log_line)
