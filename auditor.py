@@ -138,6 +138,8 @@ class Auditor(plugin.Plugin):
 
         input_string = '{: <{}}'.format(input_pointer, input_length)
 
+        print(input_string)
+
         is_return = input_string == '\r'
 
         if is_return:
@@ -179,6 +181,8 @@ class Auditor(plugin.Plugin):
 
         is_single_char = "\n" not in console_content
         incomplete_output = console_content.endswith("\n")
+
+        print(console_content)
 
         if is_single_char:
             return
