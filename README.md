@@ -22,8 +22,8 @@ cp auditor.py ~/.config/terminator/plugins/
 
 👤 **Francisco Navarro**
 
-* Twitter: [@fnm121grg](https://twitter.com/fnm121grg)
-* Github: [@grg121](https://github.com/grg121)
+* Twitter: [@fnm121grg](https://twitter.com/SpotH0und)
+* Github: [@grg121](https://github.com/spothound)
 
 ## Show your support
 
